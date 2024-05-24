@@ -29,7 +29,7 @@ class Products(private val productService: ProductsService) {
     @PostMapping
     fun setProducts(@RequestBody product: Product): ResponseEntity<Map<String, Any>> {
         val savedProduct = productService.createProduct(product)
-        if(product.name != null && product.type != null && product.inventory != null)
+        if(product.name != null && product.type != null && product.inventory != null && product.cost != null)
         {
             if(
                 product.name.matches(Regex("^[a-zA-Z\\s]+$")) && !(product.name == "true" || product.name == "false")
