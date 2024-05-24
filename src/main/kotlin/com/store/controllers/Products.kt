@@ -14,11 +14,11 @@ class Products(private val productService: ProductsService) {
     @GetMapping
     fun getAllProducts(@RequestParam(required = false) type: String?): ResponseEntity<Any> {
         val regex = Regex("^(gadget|book|food|other)$")
-        println(type+" "+type?.matches(regex))
+        println(type + " " + type?.matches(regex))
         return if (type != null) {
-            if(type.matches(regex)) {
+            if (type.matches(regex)) {
                 ResponseEntity(productService.findByType(type), HttpStatus.OK)
-            }else {
+            } else {
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body(emptyMap<String, Any>())
             }
         } else {
@@ -29,25 +29,22 @@ class Products(private val productService: ProductsService) {
     @PostMapping
     fun setProducts(@RequestBody product: Product): ResponseEntity<Map<String, Any>> {
         val savedProduct = productService.createProduct(product)
-        if(product.name != null && product.type != null && product.inventory != null && product.cost != null)
-        {
-            if(
-                product.name.matches(Regex("^[a-zA-Z\\s]+$")) && !(product.name == "true" || product.name == "false")
-                &&
-                product.type.matches(Regex("^[a-zA-Z\\s]+$")) && !(product.type == "true" || product.type == "false")
-                )
-            {
+        if (product.name != null && product.type != null && product.inventory != null && product.cost != null) {
+            if (
+                isValidString(product.name) && isValidString(product.type)) {
                 val responseBody = mapOf(
                     "id" to savedProduct.id
                 )
                 return ResponseEntity.status(HttpStatus.CREATED).body(responseBody)
-            }else
-            {
+            } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf())
             }
-        }else
-        {
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf())
         }
+    }
+
+    fun isValidString(value: String?): Boolean {
+        return value != null && value.matches(Regex("^[a-zA-Z\\s]+$")) && value !in listOf("true", "false")
     }
 }
